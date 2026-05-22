@@ -1,0 +1,9 @@
+node_modules/
+dist/
+target/
+*.log
+.turbo/
+.DS_Store
+.env
+.env.*
+go/bin/
