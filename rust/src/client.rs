@@ -50,8 +50,12 @@ impl Client {
 
     /// Runs an OSINT search (leak/service/shodan). Cost: 1 credit.
     pub async fn search(&self, req: SearchRequest) -> Result<Value, Error> {
-        self.request_value(Method::POST, "/api/v1/search", Some(serde_json::to_value(req)?))
-            .await
+        self.request_value(
+            Method::POST,
+            "/api/v1/search",
+            Some(serde_json::to_value(req)?),
+        )
+        .await
     }
 
     pub(crate) async fn request_value(

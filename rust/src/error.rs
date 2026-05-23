@@ -52,11 +52,26 @@ mod tests {
 
     #[test]
     fn maps_status_to_variant() {
-        assert!(matches!(error_from_response(401, String::new(), None), Error::Auth { .. }));
-        assert!(matches!(error_from_response(403, String::new(), None), Error::Auth { .. }));
-        assert!(matches!(error_from_response(422, String::new(), None), Error::Validation { .. }));
-        assert!(matches!(error_from_response(503, String::new(), None), Error::Server { .. }));
-        assert!(matches!(error_from_response(418, String::new(), None), Error::Api { status: 418, .. }));
+        assert!(matches!(
+            error_from_response(401, String::new(), None),
+            Error::Auth { .. }
+        ));
+        assert!(matches!(
+            error_from_response(403, String::new(), None),
+            Error::Auth { .. }
+        ));
+        assert!(matches!(
+            error_from_response(422, String::new(), None),
+            Error::Validation { .. }
+        ));
+        assert!(matches!(
+            error_from_response(503, String::new(), None),
+            Error::Server { .. }
+        ));
+        assert!(matches!(
+            error_from_response(418, String::new(), None),
+            Error::Api { status: 418, .. }
+        ));
     }
 
     #[test]

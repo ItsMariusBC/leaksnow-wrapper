@@ -103,19 +103,32 @@ mod tests {
 
     #[test]
     fn enum_serialization() {
-        assert_eq!(serde_json::to_string(&Scope::Shodan).unwrap(), r#""shodan""#);
+        assert_eq!(
+            serde_json::to_string(&Scope::Shodan).unwrap(),
+            r#""shodan""#
+        );
         assert_eq!(serde_json::to_string(&Severity::All).unwrap(), r#""all""#);
-        assert_eq!(serde_json::to_string(&UlpType::Domain).unwrap(), r#""domain""#);
+        assert_eq!(
+            serde_json::to_string(&UlpType::Domain).unwrap(),
+            r#""domain""#
+        );
         assert_eq!(
             serde_json::to_string(&IntelXBucket::LeaksPrivateGeneral).unwrap(),
             r#""leaks.private.general""#
         );
-        assert_eq!(serde_json::to_string(&IntelXBucket::DarknetTor).unwrap(), r#""darknet.tor""#);
+        assert_eq!(
+            serde_json::to_string(&IntelXBucket::DarknetTor).unwrap(),
+            r#""darknet.tor""#
+        );
     }
 
     #[test]
     fn search_request_skips_none() {
-        let b = serde_json::to_string(&SearchRequest { query: "x".into(), ..Default::default() }).unwrap();
+        let b = serde_json::to_string(&SearchRequest {
+            query: "x".into(),
+            ..Default::default()
+        })
+        .unwrap();
         assert_eq!(b, r#"{"query":"x"}"#);
         let b = serde_json::to_string(&SearchRequest {
             query: "x".into(),
@@ -129,7 +142,11 @@ mod tests {
 
     #[test]
     fn ulp_and_intelx_request_json() {
-        let b = serde_json::to_string(&UlpSearchRequest { kind: UlpType::Domain, value: "example.com".into() }).unwrap();
+        let b = serde_json::to_string(&UlpSearchRequest {
+            kind: UlpType::Domain,
+            value: "example.com".into(),
+        })
+        .unwrap();
         assert_eq!(b, r#"{"type":"domain","value":"example.com"}"#);
         let b = serde_json::to_string(&IntelXDownloadRequest {
             system_id: "abc".into(),

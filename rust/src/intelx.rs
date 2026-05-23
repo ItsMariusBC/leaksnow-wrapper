@@ -14,13 +14,19 @@ pub struct IntelX<'a> {
 impl IntelX<'_> {
     /// Returns your IntelX download history. Cost: 0.
     pub async fn downloads(&self) -> Result<Value, Error> {
-        self.client.request_value(Method::GET, "/api/v1/intelx/downloads", None).await
+        self.client
+            .request_value(Method::GET, "/api/v1/intelx/downloads", None)
+            .await
     }
 
     /// Requests an IntelX file (server-cached). Cost: 5.
     pub async fn download(&self, req: IntelXDownloadRequest) -> Result<Value, Error> {
         self.client
-            .request_value(Method::POST, "/api/v1/intelx/download", Some(serde_json::to_value(req)?))
+            .request_value(
+                Method::POST,
+                "/api/v1/intelx/download",
+                Some(serde_json::to_value(req)?),
+            )
             .await
     }
 
@@ -46,7 +52,11 @@ impl IntelX<'_> {
             .and_then(|v| v.to_str().ok())
             .and_then(parse_filename);
         let data = resp.bytes().await?.to_vec();
-        Ok(BinaryFile { data, content_type, filename })
+        Ok(BinaryFile {
+            data,
+            content_type,
+            filename,
+        })
     }
 }
 
@@ -111,11 +121,27 @@ mod tests {
 
     #[test]
     fn parses_filenames() {
-        assert_eq!(parse_filename(r#"attachment; filename="dump.bin""#).as_deref(), Some("dump.bin"));
-        assert_eq!(parse_filename("attachment; filename=plain.bin").as_deref(), Some("plain.bin"));
-        assert_eq!(parse_filename("attachment; filename*=UTF-8''r%C3%A9sum%C3%A9.bin").as_deref(), Some("résumé.bin"));
-        assert_eq!(parse_filename("attachment; filename*=UTF-8''y%20.bin").as_deref(), Some("y .bin"));
-        assert_eq!(parse_filename(r#"attachment; filename="x.bin"; filename*=UTF-8''real%20name.bin"#).as_deref(), Some("real name.bin"));
+        assert_eq!(
+            parse_filename(r#"attachment; filename="dump.bin""#).as_deref(),
+            Some("dump.bin")
+        );
+        assert_eq!(
+            parse_filename("attachment; filename=plain.bin").as_deref(),
+            Some("plain.bin")
+        );
+        assert_eq!(
+            parse_filename("attachment; filename*=UTF-8''r%C3%A9sum%C3%A9.bin").as_deref(),
+            Some("résumé.bin")
+        );
+        assert_eq!(
+            parse_filename("attachment; filename*=UTF-8''y%20.bin").as_deref(),
+            Some("y .bin")
+        );
+        assert_eq!(
+            parse_filename(r#"attachment; filename="x.bin"; filename*=UTF-8''real%20name.bin"#)
+                .as_deref(),
+            Some("real name.bin")
+        );
         assert_eq!(parse_filename(""), None);
     }
 }

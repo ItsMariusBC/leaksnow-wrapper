@@ -59,13 +59,22 @@ mod tests {
 
     #[test]
     fn retry_after_wins_capped() {
-        assert_eq!(backoff_delay(0, &cfg(), Some(Duration::from_secs(1)), 0.5), Duration::from_secs(1));
-        assert_eq!(backoff_delay(0, &cfg(), Some(Duration::from_secs(3600)), 0.5), Duration::from_secs(8));
+        assert_eq!(
+            backoff_delay(0, &cfg(), Some(Duration::from_secs(1)), 0.5),
+            Duration::from_secs(1)
+        );
+        assert_eq!(
+            backoff_delay(0, &cfg(), Some(Duration::from_secs(3600)), 0.5),
+            Duration::from_secs(8)
+        );
     }
 
     #[test]
     fn full_jitter_on_exponential() {
-        assert_eq!(backoff_delay(0, &cfg(), None, 0.5), Duration::from_millis(250));
+        assert_eq!(
+            backoff_delay(0, &cfg(), None, 0.5),
+            Duration::from_millis(250)
+        );
         assert_eq!(backoff_delay(2, &cfg(), None, 0.5), Duration::from_secs(1));
     }
 

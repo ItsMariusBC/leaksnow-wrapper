@@ -27,7 +27,10 @@ pub use types::{
 };
 
 mod client;
+mod intelx;
 mod shodan;
 mod ulp;
-mod intelx;
 pub use client::{Client, ClientBuilder};
+pub use intelx::IntelX;
+pub use shodan::Shodan;
+pub use ulp::Ulp;

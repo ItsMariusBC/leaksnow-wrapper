@@ -12,13 +12,19 @@ pub struct Shodan<'a> {
 impl Shodan<'_> {
     /// Lists your custom Shodan scans. Cost: 0.
     pub async fn custom_scans(&self) -> Result<Value, Error> {
-        self.client.request_value(Method::GET, "/api/v1/shodan/custom-scans", None).await
+        self.client
+            .request_value(Method::GET, "/api/v1/shodan/custom-scans", None)
+            .await
     }
 
     /// Launches a Shodan scan on the target. Cost: 1.
     pub async fn custom_scan(&self, req: ShodanCustomScanRequest) -> Result<Value, Error> {
         self.client
-            .request_value(Method::POST, "/api/v1/shodan/custom-scan", Some(serde_json::to_value(req)?))
+            .request_value(
+                Method::POST,
+                "/api/v1/shodan/custom-scan",
+                Some(serde_json::to_value(req)?),
+            )
             .await
     }
 
@@ -46,7 +52,9 @@ pub(crate) fn urlencode(seg: &str) -> String {
     let mut out = String::with_capacity(seg.len());
     for b in seg.bytes() {
         match b {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' => out.push(b as char),
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' => {
+                out.push(b as char)
+            }
             _ => out.push_str(&format!("%{:02X}", b)),
         }
     }
