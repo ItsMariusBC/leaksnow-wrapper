@@ -16,3 +16,6 @@
 
 mod error;
 pub use error::Error;
+
+mod retry;
+pub use retry::RetryConfig;
