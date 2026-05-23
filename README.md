@@ -6,7 +6,7 @@ Multi-language SDKs for the [leaks.now](https://leaks.now) `/api/v1` OSINT API.
 |---|---|---|
 | TypeScript | `packages/typescript` (`@leaksnow/sdk`) | available |
 | Go | `go/` (`github.com/ItsMariusBC/leaksnow-wrapper/go`) | available |
-| Rust | `rust/` | planned |
+| Rust | `rust/` (`leaksnow` crate) | available |
 
 The API contract lives in [`docs/openapi.yaml`](docs/openapi.yaml).
 
@@ -90,6 +90,38 @@ git push origin go/v0.1.0
 ```
 
 Then `go get github.com/ItsMariusBC/leaksnow-wrapper/go@v0.1.0`.
+
+## Rust
+
+```toml
+[dependencies]
+leaksnow = "0.1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+```
+
+```rust
+use leaksnow::{Client, SearchRequest, Scope};
+
+#[tokio::main]
+async fn main() -> Result<(), leaksnow::Error> {
+    let client = Client::new(std::env::var("LEAKSNOW_API_KEY").unwrap());
+
+    let leaks = client.search(SearchRequest {
+        query: "host:example.com".into(),
+        scope: Some(Scope::Leak),
+        ..Default::default()
+    }).await?;
+
+    let file = client.intelx().get_file("7").await?; // BinaryFile { data, content_type, filename }
+    let _ = (leaks, file);
+    Ok(())
+}
+```
+
+JSON responses are returned as `serde_json::Value` (provider documents request
+bodies only). Errors are the `leaksnow::Error` enum (`Auth`, `Quota`,
+`Validation`, `Server`, `Api`, `Transport`, `Decode`). Retries are off by
+default; enable with `Client::builder(key).retry(RetryConfig { .. }).build()`.
 
 ## Releasing `@leaksnow/sdk`
 
