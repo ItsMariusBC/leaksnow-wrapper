@@ -49,3 +49,24 @@ pnpm test        # all packages
 pnpm build
 pnpm typecheck
 ```
+
+## Releasing `@leaksnow/sdk`
+
+Publishing is automated by [`.github/workflows/publish.yml`](.github/workflows/publish.yml),
+triggered on a `v*` git tag.
+
+**One-time setup:** add an npm automation token as the repo secret `NPM_TOKEN`
+(Settings → Secrets and variables → Actions). The token's npm account must own
+the `@leaksnow` scope.
+
+**To publish a version:**
+
+```bash
+# 1. bump packages/typescript/package.json "version" (e.g. 0.2.0) and commit
+# 2. tag with the SAME version, prefixed with v
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+The workflow checks the tag matches `package.json` version, runs tests + build,
+then `npm publish --provenance --access public` (verified provenance badge on npm).
