@@ -19,3 +19,9 @@ pub use error::Error;
 
 mod retry;
 pub use retry::RetryConfig;
+
+mod types;
+pub use types::{
+    BinaryFile, IntelXBucket, IntelXDownloadRequest, Scope, SearchRequest, Severity,
+    ShodanCustomScanRequest, UlpDownloadRequest, UlpSearchRequest, UlpType,
+};
