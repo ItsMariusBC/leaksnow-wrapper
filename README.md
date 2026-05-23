@@ -78,9 +78,18 @@ bodies only); decode into your own structs. Errors are typed — use `errors.As`
 with `*leaksnow.AuthError`, `*leaksnow.QuotaError`, `*leaksnow.ValidationError`,
 `*leaksnow.ServerError`, or `*leaksnow.TransportError` (network/timeout).
 
-**Releasing:** Go modules are consumed straight from VCS. Tag the submodule with
-the `go/` prefix, e.g. `git tag go/v0.1.0 && git push origin go/v0.1.0`, then
-`go get github.com/ItsMariusBC/leaksnow-wrapper/go@go/v0.1.0`.
+**Releasing:** Go modules are consumed straight from VCS — there is no registry
+upload. Pushing a `go/v*` tag triggers
+[`.github/workflows/go-release.yml`](.github/workflows/go-release.yml), which
+runs build + vet + race tests, creates a GitHub Release, and warms
+`proxy.golang.org` so the version is indexed on pkg.go.dev:
+
+```bash
+git tag go/v0.1.0
+git push origin go/v0.1.0
+```
+
+Then `go get github.com/ItsMariusBC/leaksnow-wrapper/go@v0.1.0`.
 
 ## Releasing `@leaksnow/sdk`
 
