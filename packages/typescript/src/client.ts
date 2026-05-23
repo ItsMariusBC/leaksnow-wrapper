@@ -1,5 +1,6 @@
 import { errorFromResponse, LeaksNowError } from "./errors.js";
 import { DEFAULT_RETRY, backoffDelay, shouldRetry, type RetryOptions } from "./retry.js";
+import type { SearchRequest, SearchResponse } from "./types.js";
 
 export interface ClientConfig {
   baseUrl?: string;
@@ -86,6 +87,18 @@ export class Transport {
   async request<T>(method: string, path: string, opts: RequestOptions = {}): Promise<T> {
     const res = await this.requestRaw(method, path, opts);
     return (await safeJson(res)) as T;
+  }
+}
+
+export class LeaksNowClient {
+  protected readonly transport: Transport;
+
+  constructor(apiKey: string, config: ClientConfig = {}) {
+    this.transport = new Transport(apiKey, config);
+  }
+
+  search(body: SearchRequest): Promise<SearchResponse> {
+    return this.transport.request<SearchResponse>("POST", "/api/v1/search", { body });
   }
 }
 
