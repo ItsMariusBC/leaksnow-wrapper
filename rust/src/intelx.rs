@@ -86,6 +86,7 @@ pub(crate) fn parse_filename(disposition: &str) -> Option<String> {
 }
 
 fn find_ci<'a>(haystack: &'a str, token: &str) -> Option<&'a str> {
+    debug_assert!(token.is_ascii(), "find_ci only safe for ASCII tokens");
     let lower = haystack.to_ascii_lowercase();
     let idx = lower.find(token)?;
     let after = &haystack[idx + token.len()..];

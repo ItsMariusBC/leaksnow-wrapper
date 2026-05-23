@@ -1,6 +1,15 @@
 use std::time::Duration;
 
 /// Controls automatic retries. Disabled by default (`max_retries == 0`).
+///
+/// When enabled, retries fire on responses whose status appears in `retry_on`.
+/// **Transport-level failures (network errors, timeouts) are NOT retried** —
+/// they surface as [`crate::Error::Transport`] immediately. This mirrors the
+/// TypeScript and Go ports.
+///
+/// The `Retry-After` header is honored **only in its numeric delta-seconds
+/// form** (RFC 7231). HTTP-date form is ignored and falls back to jittered
+/// exponential backoff.
 #[derive(Debug, Clone)]
 pub struct RetryConfig {
     pub max_retries: u32,

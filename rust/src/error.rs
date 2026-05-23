@@ -8,7 +8,8 @@ pub enum Error {
     /// 401 / 403.
     #[error("leaksnow: authentication failed ({status})")]
     Auth { status: u16, body: String },
-    /// 429. `retry_after` is set when the server sent a numeric Retry-After.
+    /// 429. `retry_after` is set when the server sent a numeric `Retry-After`
+    ///      header (delta-seconds form only; HTTP-date form is ignored).
     #[error("leaksnow: quota exceeded (429)")]
     Quota {
         retry_after: Option<Duration>,
@@ -20,7 +21,8 @@ pub enum Error {
     /// 5xx.
     #[error("leaksnow: server error ({status})")]
     Server { status: u16, body: String },
-    /// Any other non-success status.
+    /// Catch-all for non-success statuses that don't match a more specific
+    /// variant (typically uncommon 4xx codes such as 404/405/409/410).
     #[error("leaksnow: request failed ({status})")]
     Api { status: u16, body: String },
     /// Network / timeout / connection failure.
