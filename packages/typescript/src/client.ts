@@ -8,6 +8,7 @@ import { IntelxResource } from "./resources/intelx.js";
 export interface ClientConfig {
   baseUrl?: string;
   fetch?: typeof fetch;
+  /** Per-attempt timeout in ms (does not bound total time across retries). Default 30000. */
   timeoutMs?: number;
   retry?: Partial<RetryOptions>;
 }
@@ -19,6 +20,7 @@ export interface RequestOptions {
 const DEFAULT_BASE_URL = "https://leaks.now";
 const DEFAULT_TIMEOUT_MS = 30_000;
 
+// Only the numeric delta-seconds form is honored; HTTP-date form falls back to jittered backoff.
 function parseRetryAfter(res: Response): number | undefined {
   const raw = res.headers.get("retry-after");
   if (raw == null) return undefined;
@@ -65,7 +67,6 @@ export class Transport {
       try {
         res = await this.#fetch(url, { method, headers, body, signal: controller.signal });
       } catch (cause) {
-        clearTimeout(timer);
         const isAbort = cause instanceof Error && cause.name === "AbortError";
         throw new LeaksNowError(isAbort ? "request timed out" : "network request failed", {
           code: isAbort ? "timeout" : "network",

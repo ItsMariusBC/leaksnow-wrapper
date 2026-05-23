@@ -9,8 +9,18 @@ import type {
 
 function parseFilename(disposition: string | null): string | undefined {
   if (!disposition) return undefined;
-  const match = /filename\*?=(?:UTF-8''|")?([^\";]+)"?/i.exec(disposition);
-  return match?.[1];
+  // RFC 5987 extended form takes precedence; decode percent-encoding.
+  const ext = /filename\*\s*=\s*(?:UTF-8|ISO-8859-1)?''([^;]+)/i.exec(disposition);
+  if (ext?.[1]) {
+    const raw = ext[1].trim();
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
+  }
+  const basic = /filename\s*=\s*"?([^";]+)"?/i.exec(disposition);
+  return basic?.[1]?.trim();
 }
 
 export class IntelxResource {
@@ -28,7 +38,7 @@ export class IntelxResource {
   }
 
   async getFile(id: ResourceId): Promise<BinaryFile> {
-    const res = await this.#transport.requestRaw("GET", `/api/v1/intelx/downloads/${id}/file`);
+    const res = await this.#transport.requestRaw("GET", `/api/v1/intelx/downloads/${encodeURIComponent(String(id))}/file`);
     const data = await res.arrayBuffer();
     return {
       data,
@@ -38,6 +48,6 @@ export class IntelxResource {
   }
 
   deleteDownload(id: ResourceId): Promise<unknown> {
-    return this.#transport.request<unknown>("DELETE", `/api/v1/intelx/downloads/${id}`);
+    return this.#transport.request<unknown>("DELETE", `/api/v1/intelx/downloads/${encodeURIComponent(String(id))}`);
   }
 }

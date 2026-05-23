@@ -23,6 +23,7 @@ export class LeaksNowError extends Error {
     this.body = opts.body;
     this.code = opts.code ?? "http";
     this.retryAfterMs = opts.retryAfterMs;
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 

@@ -22,14 +22,14 @@ export class ShodanResource {
   }
 
   getScan(id: ResourceId): Promise<ShodanScan> {
-    return this.#transport.request<ShodanScan>("GET", `/api/v1/shodan/custom-scans/${id}`);
+    return this.#transport.request<ShodanScan>("GET", `/api/v1/shodan/custom-scans/${encodeURIComponent(String(id))}`);
   }
 
   deleteScan(id: ResourceId): Promise<unknown> {
-    return this.#transport.request<unknown>("DELETE", `/api/v1/shodan/custom-scans/${id}`);
+    return this.#transport.request<unknown>("DELETE", `/api/v1/shodan/custom-scans/${encodeURIComponent(String(id))}`);
   }
 
   host(ip: string): Promise<ShodanHost> {
-    return this.#transport.request<ShodanHost>("GET", `/api/v1/shodan/host/${ip}`);
+    return this.#transport.request<ShodanHost>("GET", `/api/v1/shodan/host/${encodeURIComponent(ip)}`);
   }
 }

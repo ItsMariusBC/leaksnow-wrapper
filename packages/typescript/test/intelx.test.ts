@@ -44,6 +44,34 @@ describe("client.intelx", () => {
     expect(new Uint8Array(file.data)).toEqual(bytes);
   });
 
+  it("getFile decodes RFC 5987 filename* (percent-encoded)", async () => {
+    const res = new Response(new Uint8Array([0]), {
+      status: 200,
+      headers: {
+        "content-type": "application/octet-stream",
+        "content-disposition": "attachment; filename*=UTF-8''r%C3%A9sum%C3%A9.bin",
+      },
+    });
+    const fetchMock = vi.fn().mockResolvedValue(res);
+    const client = new LeaksNowClient("ms_key", { fetch: fetchMock });
+    const file = await client.intelx.getFile(1);
+    expect(file.filename).toBe("résumé.bin");
+  });
+
+  it("getFile prefers filename* over plain filename", async () => {
+    const res = new Response(new Uint8Array([0]), {
+      status: 200,
+      headers: {
+        "content-type": "application/octet-stream",
+        "content-disposition": "attachment; filename=\"fallback.bin\"; filename*=UTF-8''real%20name.bin",
+      },
+    });
+    const fetchMock = vi.fn().mockResolvedValue(res);
+    const client = new LeaksNowClient("ms_key", { fetch: fetchMock });
+    const file = await client.intelx.getFile(1);
+    expect(file.filename).toBe("real name.bin");
+  });
+
   it("deleteDownload DELETEs by id", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ ok: true }));
     const client = new LeaksNowClient("ms_key", { fetch: fetchMock });
