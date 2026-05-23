@@ -2,6 +2,7 @@ import { errorFromResponse, LeaksNowError } from "./errors.js";
 import { DEFAULT_RETRY, backoffDelay, shouldRetry, type RetryOptions } from "./retry.js";
 import type { SearchRequest, SearchResponse } from "./types.js";
 import { ShodanResource } from "./resources/shodan.js";
+import { UlpResource } from "./resources/ulp.js";
 
 export interface ClientConfig {
   baseUrl?: string;
@@ -94,10 +95,12 @@ export class Transport {
 export class LeaksNowClient {
   protected readonly transport: Transport;
   readonly shodan: ShodanResource;
+  readonly ulp: UlpResource;
 
   constructor(apiKey: string, config: ClientConfig = {}) {
     this.transport = new Transport(apiKey, config);
     this.shodan = new ShodanResource(this.transport);
+    this.ulp = new UlpResource(this.transport);
   }
 
   search(body: SearchRequest): Promise<SearchResponse> {
