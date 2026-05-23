@@ -2,6 +2,27 @@
   "name": "@leaksnow/sdk",
   "version": "0.1.0",
   "description": "TypeScript SDK for the leaks.now /api/v1 OSINT API",
+  "license": "MIT",
+  "author": "Marius BC <marius.bc@ik.me>",
+  "homepage": "https://github.com/ItsMariusBC/leaksnow-wrapper/tree/main/packages/typescript#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ItsMariusBC/leaksnow-wrapper.git",
+    "directory": "packages/typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/ItsMariusBC/leaksnow-wrapper/issues"
+  },
+  "keywords": [
+    "leaks.now",
+    "osint",
+    "shodan",
+    "intelx",
+    "ulp",
+    "sdk",
+    "api-client"
+  ],
+  "sideEffects": false,
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -13,7 +34,7 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
     "build": "tsup",
     "test": "vitest run",

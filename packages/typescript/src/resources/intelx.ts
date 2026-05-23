@@ -37,6 +37,13 @@ export class IntelxResource {
     return this.#transport.request<IntelxDownloadResponse>("POST", "/api/v1/intelx/download", { body });
   }
 
+  /**
+   * Download a stored IntelX file by id.
+   *
+   * Returns raw bytes as a {@link BinaryFile}, NOT parsed JSON. Persist with e.g.
+   * `await writeFile(file.filename ?? "download.bin", Buffer.from(file.data))`.
+   * `filename` is best-effort parsed from `Content-Disposition` and may be undefined.
+   */
   async getFile(id: ResourceId): Promise<BinaryFile> {
     const res = await this.#transport.requestRaw("GET", `/api/v1/intelx/downloads/${encodeURIComponent(String(id))}/file`);
     const data = await res.arrayBuffer();
