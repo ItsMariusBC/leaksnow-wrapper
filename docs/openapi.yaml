@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: leaks.now API
+  version: v1
+  description: OSINT API — Leak, Service, Shodan, ULP, IntelX. Hand-authored from provider docs (requests documented; response shapes best-effort).
+servers:
+  - url: https://leaks.now
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "ms_*"
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/search:
+    post:
+      summary: OSINT search (leak/service/shodan). Cost 1.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query: { type: string }
+                scope: { type: string, enum: [leak, service, shodan], default: leak }
+                plugin: { type: string }
+                severity: { type: string, enum: [critical, high, medium, low, info, all] }
+                page: { type: integer, default: 0 }
+      responses: { "200": { description: OK } }
+  /api/v1/shodan/custom-scans:
+    get:
+      summary: List custom Shodan scans. Cost 0.
+      responses: { "200": { description: OK } }
+  /api/v1/shodan/custom-scan:
+    post:
+      summary: Launch a custom Shodan scan. Cost 1.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target]
+              properties: { target: { type: string } }
+      responses: { "200": { description: OK } }
+  /api/v1/shodan/custom-scans/{id}:
+    get:
+      summary: Get scan status by id. Cost 0.
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { "200": { description: OK } }
+    delete:
+      summary: Delete scan entry. Cost 0.
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { "200": { description: OK } }
+  /api/v1/shodan/host/{ip}:
+    get:
+      summary: Aggregated Shodan view for an IPv4. Cost 0.
+      parameters: [{ name: ip, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK } }
+  /api/v1/ulp/search:
+    post:
+      summary: ULP (Leak Zero) search. Cost 1.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, value]
+              properties:
+                type: { type: string, enum: [domain, email, username, password] }
+                value: { type: string }
+      responses: { "200": { description: OK — includes downloadToken (~15 min) } }
+  /api/v1/ulp/download:
+    post:
+      summary: JSON export of fetched ULP rows. Cost 10.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties: { token: { type: string } }
+      responses: { "200": { description: OK } }
+  /api/v1/intelx/downloads:
+    get:
+      summary: IntelX download history. Cost 0.
+      responses: { "200": { description: OK } }
+  /api/v1/intelx/download:
+    post:
+      summary: Request an IntelX file (server-cached). Cost 5.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [systemId, bucket]
+              properties:
+                systemId: { type: string, format: uuid }
+                bucket: { type: string, enum: [leaks.private.general, leaks.logs, whois, dns, darknet.tor] }
+      responses: { "200": { description: OK } }
+  /api/v1/intelx/downloads/{id}/file:
+    get:
+      summary: Download cached binary (no re-billing). Cost 0.
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+  /api/v1/intelx/downloads/{id}:
+    delete:
+      summary: Hide an entry from IntelX history. Cost 0.
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: OK } }
