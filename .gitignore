@@ -7,3 +7,6 @@ target/
 .env
 .env.*
 go/bin/
+
+# Internal design docs (specs/plans) — keep docs/openapi.yaml tracked
+docs/superpowers/
