@@ -3,6 +3,7 @@ import { DEFAULT_RETRY, backoffDelay, shouldRetry, type RetryOptions } from "./r
 import type { SearchRequest, SearchResponse } from "./types.js";
 import { ShodanResource } from "./resources/shodan.js";
 import { UlpResource } from "./resources/ulp.js";
+import { IntelxResource } from "./resources/intelx.js";
 
 export interface ClientConfig {
   baseUrl?: string;
@@ -96,11 +97,13 @@ export class LeaksNowClient {
   protected readonly transport: Transport;
   readonly shodan: ShodanResource;
   readonly ulp: UlpResource;
+  readonly intelx: IntelxResource;
 
   constructor(apiKey: string, config: ClientConfig = {}) {
     this.transport = new Transport(apiKey, config);
     this.shodan = new ShodanResource(this.transport);
     this.ulp = new UlpResource(this.transport);
+    this.intelx = new IntelxResource(this.transport);
   }
 
   search(body: SearchRequest): Promise<SearchResponse> {
