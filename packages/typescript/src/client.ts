@@ -1,6 +1,7 @@
 import { errorFromResponse, LeaksNowError } from "./errors.js";
 import { DEFAULT_RETRY, backoffDelay, shouldRetry, type RetryOptions } from "./retry.js";
 import type { SearchRequest, SearchResponse } from "./types.js";
+import { ShodanResource } from "./resources/shodan.js";
 
 export interface ClientConfig {
   baseUrl?: string;
@@ -92,9 +93,11 @@ export class Transport {
 
 export class LeaksNowClient {
   protected readonly transport: Transport;
+  readonly shodan: ShodanResource;
 
   constructor(apiKey: string, config: ClientConfig = {}) {
     this.transport = new Transport(apiKey, config);
+    this.shodan = new ShodanResource(this.transport);
   }
 
   search(body: SearchRequest): Promise<SearchResponse> {
