@@ -80,6 +80,7 @@ func TestParseFilename(t *testing.T) {
 		`attachment; filename=plain.bin`:                          "plain.bin",
 		`attachment; filename*=UTF-8''r%C3%A9sum%C3%A9.bin`:       "résumé.bin",
 		`attachment; filename="x.bin"; filename*=UTF-8''y%20.bin`: "y .bin",
+		`attachment; filename*=UTF-8'en'file.bin`:                 "file.bin",
 		``: "",
 	}
 	for in, want := range cases {

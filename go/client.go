@@ -22,6 +22,7 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 	retry      RetryConfig
+	timeout    time.Duration // pending timeout from WithTimeout; applied after options
 
 	// Service namespaces.
 	Shodan *ShodanService
@@ -46,10 +47,11 @@ func WithHTTPClient(h *http.Client) Option {
 	}
 }
 
-// WithTimeout sets the per-request timeout on the underlying http.Client.
+// WithTimeout sets the per-request timeout on the underlying http.Client,
+// applied after all options so it is honored regardless of option order.
 // It does not bound total time across retries.
 func WithTimeout(d time.Duration) Option {
-	return func(c *Client) { c.httpClient.Timeout = d }
+	return func(c *Client) { c.timeout = d }
 }
 
 // WithRetry enables and configures automatic retries (disabled by default).
@@ -68,10 +70,21 @@ func NewClient(apiKey string, opts ...Option) *Client {
 	for _, o := range opts {
 		o(c)
 	}
+	if c.timeout > 0 {
+		c.httpClient.Timeout = c.timeout
+	}
 	c.Shodan = &ShodanService{client: c}
 	c.ULP = &ULPService{client: c}
 	c.IntelX = &IntelXService{client: c}
 	return c
+}
+
+func isTimeout(err error) bool {
+	var ne net.Error
+	if errors.As(err, &ne) && ne.Timeout() {
+		return true
+	}
+	return errors.Is(err, context.DeadlineExceeded)
 }
 
 func parseRetryAfter(resp *http.Response) time.Duration {
@@ -119,15 +132,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body any) (
 
 		resp, err := c.httpClient.Do(req)
 		if err != nil {
-			timeout := false
-			var ne net.Error
-			if errors.As(err, &ne) && ne.Timeout() {
-				timeout = true
-			}
-			if errors.Is(err, context.DeadlineExceeded) {
-				timeout = true
-			}
-			return nil, &TransportError{Op: op, Err: err, Timeout: timeout}
+			return nil, &TransportError{Op: op, Err: err, Timeout: isTimeout(err)}
 		}
 
 		if resp.StatusCode < 300 {
@@ -171,7 +176,11 @@ func (c *Client) doJSON(ctx context.Context, method, path string, body any) (jso
 		return nil, err
 	}
 	defer resp.Body.Close()
-	return io.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, &TransportError{Op: method + " " + path, Err: err, Timeout: isTimeout(err)}
+	}
+	return data, nil
 }
 
 // Search runs an OSINT search (leak/service/shodan). Cost: 1 credit.

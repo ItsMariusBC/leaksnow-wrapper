@@ -48,7 +48,7 @@ func (s *IntelXService) GetFile(ctx context.Context, id string) (*BinaryFile, er
 }
 
 var (
-	reFilenameExt   = regexp.MustCompile(`(?i)filename\*\s*=\s*(?:UTF-8|ISO-8859-1)?''([^;]+)`)
+	reFilenameExt   = regexp.MustCompile(`(?i)filename\*\s*=\s*(?:[\w-]+)?'[^']*'([^;]+)`)
 	reFilenameBasic = regexp.MustCompile(`(?i)filename\s*=\s*"?([^";]+)"?`)
 )
 

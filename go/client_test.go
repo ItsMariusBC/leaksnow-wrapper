@@ -139,6 +139,15 @@ func TestDoRequestTimeout(t *testing.T) {
 	}
 }
 
+func TestWithTimeoutHonoredRegardlessOfOrder(t *testing.T) {
+	custom := &http.Client{}
+	c := NewClient("ms_key", WithTimeout(7*time.Second), WithHTTPClient(custom))
+	if custom.Timeout != 7*time.Second {
+		t.Fatalf("timeout = %v, want 7s applied after WithHTTPClient", custom.Timeout)
+	}
+	_ = c
+}
+
 func TestSearchHitsEndpoint(t *testing.T) {
 	var path string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
