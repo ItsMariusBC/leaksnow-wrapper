@@ -25,3 +25,9 @@ pub use types::{
     BinaryFile, IntelXBucket, IntelXDownloadRequest, Scope, SearchRequest, Severity,
     ShodanCustomScanRequest, UlpDownloadRequest, UlpSearchRequest, UlpType,
 };
+
+mod client;
+mod shodan;
+mod ulp;
+mod intelx;
+pub use client::{Client, ClientBuilder};
