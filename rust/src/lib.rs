@@ -13,3 +13,6 @@
 //!
 //! Authentication uses an `Authorization: Bearer ms_...` header. Each successful
 //! call consumes the credits documented in `docs/openapi.yaml` at the repo root.
+
+mod error;
+pub use error::Error;
