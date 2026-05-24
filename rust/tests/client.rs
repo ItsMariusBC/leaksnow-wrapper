@@ -17,7 +17,10 @@ async fn sends_bearer_and_parses() {
 
     let client = Client::builder("ms_key").base_url(server.uri()).build();
     let v = client
-        .search(SearchRequest { query: "x".into(), ..Default::default() })
+        .search(SearchRequest {
+            query: "x".into(),
+            ..Default::default()
+        })
         .await
         .unwrap();
     assert_eq!(v, serde_json::json!({"ok": true}));
@@ -28,7 +31,9 @@ async fn maps_auth_error() {
     let server = MockServer::start().await;
     Mock::given(method("POST"))
         .and(path("/api/v1/search"))
-        .respond_with(ResponseTemplate::new(401).set_body_json(serde_json::json!({"error": "bad key"})))
+        .respond_with(
+            ResponseTemplate::new(401).set_body_json(serde_json::json!({"error": "bad key"})),
+        )
         .mount(&server)
         .await;
 

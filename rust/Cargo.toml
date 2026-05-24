@@ -2,7 +2,7 @@
 name = "leaksnow"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.75"
+rust-version = "1.86"
 description = "Async Rust client for the leaks.now /api/v1 OSINT API"
 license = "MIT"
 repository = "https://github.com/ItsMariusBC/leaksnow-wrapper"
