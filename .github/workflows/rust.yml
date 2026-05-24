@@ -31,5 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.86
+      # MSRV applies to the library build only — dev-deps (wiremock) require a
+      # newer toolchain and are exercised by the `test` job on stable.
       - run: cargo build
-      - run: cargo test --no-run
