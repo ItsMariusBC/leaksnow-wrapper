@@ -32,6 +32,9 @@ async fn main() -> Result<(), leaksnow::Error> {
         })
         .await?;
 
-    println!("{}", serde_json::to_string_pretty(&results).unwrap_or_default());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&results).unwrap_or_default()
+    );
     Ok(())
 }
