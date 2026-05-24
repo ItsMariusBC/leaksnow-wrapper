@@ -13,7 +13,7 @@ The API contract lives in [`docs/openapi.yaml`](docs/openapi.yaml).
 ## TypeScript
 
 ```bash
-pnpm add @leaksnow/sdk   # once published
+pnpm add @leaksnow/sdk
 ```
 
 ```ts
@@ -40,15 +40,6 @@ Timeouts/network failures throw `LeaksNowError` with `code` `"timeout"`/`"networ
 
 Pass your `ms_*` key. Each successful call consumes the credits listed in `docs/openapi.yaml`.
 **Never commit a real key.** Use an env var.
-
-## Development
-
-```bash
-pnpm install
-pnpm test        # all packages
-pnpm build
-pnpm typecheck
-```
 
 ## Go
 
@@ -77,19 +68,6 @@ JSON responses are returned as `json.RawMessage` (the provider documents request
 bodies only); decode into your own structs. Errors are typed — use `errors.As`
 with `*leaksnow.AuthError`, `*leaksnow.QuotaError`, `*leaksnow.ValidationError`,
 `*leaksnow.ServerError`, or `*leaksnow.TransportError` (network/timeout).
-
-**Releasing:** Go modules are consumed straight from VCS — there is no registry
-upload. Pushing a `go/v*` tag triggers
-[`.github/workflows/go-release.yml`](.github/workflows/go-release.yml), which
-runs build + vet + race tests, creates a GitHub Release, and warms
-`proxy.golang.org` so the version is indexed on pkg.go.dev:
-
-```bash
-git tag go/v0.1.0
-git push origin go/v0.1.0
-```
-
-Then `go get github.com/ItsMariusBC/leaksnow-wrapper/go@v0.1.0`.
 
 ## Rust
 
@@ -123,23 +101,3 @@ bodies only). Errors are the `leaksnow::Error` enum (`Auth`, `Quota`,
 `Validation`, `Server`, `Api`, `Transport`, `Decode`). Retries are off by
 default; enable with `Client::builder(key).retry(RetryConfig { .. }).build()`.
 
-## Releasing `@leaksnow/sdk`
-
-Publishing is automated by [`.github/workflows/publish.yml`](.github/workflows/publish.yml),
-triggered on a `v*` git tag.
-
-**One-time setup:** add an npm automation token as the repo secret `NPM_TOKEN`
-(Settings → Secrets and variables → Actions). The token's npm account must own
-the `@leaksnow` scope.
-
-**To publish a version:**
-
-```bash
-# 1. bump packages/typescript/package.json "version" (e.g. 0.2.0) and commit
-# 2. tag with the SAME version, prefixed with v
-git tag v0.2.0
-git push origin v0.2.0
-```
-
-The workflow checks the tag matches `package.json` version, runs tests + build,
-then `npm publish --provenance --access public` (verified provenance badge on npm).

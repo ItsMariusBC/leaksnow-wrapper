@@ -1,0 +1,52 @@
+name: Release leaksnow (Rust)
+
+on:
+  push:
+    tags:
+      - "rust/v*"
+
+permissions:
+  contents: write # create the GitHub Release
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify tag matches Cargo.toml version
+        run: |
+          TAG="${GITHUB_REF_NAME#rust/v}"
+          PKG=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          echo "tag=v$TAG package=$PKG"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::Tag rust/v$TAG does not match Cargo.toml version $PKG. Bump the version and retag."
+            exit 1
+          fi
+
+      - name: Test
+        run: cargo test
+
+      - name: Publish to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#rust/v}"
+          gh release create "${GITHUB_REF_NAME}" \
+            --verify-tag \
+            --title "leaksnow (Rust) v${VERSION}" \
+            --notes "Crate \`leaksnow\` v${VERSION} published to [crates.io](https://crates.io/crates/leaksnow/${VERSION}).
+
+          \`\`\`toml
+          [dependencies]
+          leaksnow = \"${VERSION}\"
+          \`\`\`"
